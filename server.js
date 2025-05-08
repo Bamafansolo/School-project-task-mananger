@@ -10,7 +10,11 @@ const app = express();
 
 // Middleware
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors({
+    origin: process.env.NODE_ENV === 'production' 
+        ? 'https://{repl-name}.{username}.repl.co'
+        : '*'
+}));
 
 // Routes
 const authRoutes = require('./routes/auth');
