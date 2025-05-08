@@ -8,7 +8,7 @@ exports.register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const query = 'INSERT INTO users (username, email, password) VALUES (?, ?, ?)';
-    db.query(query, [username, email, hashedPassword], (err) => {
+    db.run(query, [username, email, hashedPassword], (err) => {
         if (err) {
             res.status(500).json({ error: err.message });
         } else {

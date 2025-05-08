@@ -1,26 +1,25 @@
-
 const db = require('../config/db');
 
 exports.getAllProjects = (req, res) => {
     const query = 'SELECT * FROM projects WHERE user_id = ?';
-    db.query(query, [req.user.id], (err, results) => {
+    db.all(query, [req.user.id], (err, rows) => {
         if (err) {
             res.status(500).json({ error: err.message });
         } else {
-            res.json(results);
+            res.json(rows);
         }
     });
 };
 
 exports.getProject = (req, res) => {
     const query = 'SELECT * FROM projects WHERE id = ? AND user_id = ?';
-    db.query(query, [req.params.id, req.user.id], (err, results) => {
+    db.all(query, [req.params.id, req.user.id], (err, rows) => {
         if (err) {
             res.status(500).json({ error: err.message });
-        } else if (results.length === 0) {
+        } else if (rows.length === 0) {
             res.status(404).json({ error: 'Project not found' });
         } else {
-            res.json(results[0]);
+            res.json(rows[0]);
         }
     });
 };
@@ -28,11 +27,11 @@ exports.getProject = (req, res) => {
 exports.createProject = (req, res) => {
     const { name } = req.body;
     const query = 'INSERT INTO projects (user_id, name) VALUES (?, ?)';
-    db.query(query, [req.user.id, name], (err, result) => {
+    db.run(query, [req.user.id, name], function(err) {
         if (err) {
             res.status(500).json({ error: err.message });
         } else {
-            res.status(201).json({ id: result.insertId, name });
+            res.status(201).json({ id: this.lastID, name });
         }
     });
 };
@@ -40,10 +39,10 @@ exports.createProject = (req, res) => {
 exports.updateProject = (req, res) => {
     const { name } = req.body;
     const query = 'UPDATE projects SET name = ? WHERE id = ? AND user_id = ?';
-    db.query(query, [name, req.params.id, req.user.id], (err, result) => {
+    db.run(query, [name, req.params.id, req.user.id], function(err) {
         if (err) {
             res.status(500).json({ error: err.message });
-        } else if (result.affectedRows === 0) {
+        } else if (this.changes === 0) {
             res.status(404).json({ error: 'Project not found' });
         } else {
             res.json({ message: 'Project updated successfully' });
@@ -53,10 +52,10 @@ exports.updateProject = (req, res) => {
 
 exports.deleteProject = (req, res) => {
     const query = 'DELETE FROM projects WHERE id = ? AND user_id = ?';
-    db.query(query, [req.params.id, req.user.id], (err, result) => {
+    db.run(query, [req.params.id, req.user.id], function(err) {
         if (err) {
             res.status(500).json({ error: err.message });
-        } else if (result.affectedRows === 0) {
+        } else if (this.changes === 0) {
             res.status(404).json({ error: 'Project not found' });
         } else {
             res.json({ message: 'Project deleted successfully' });
