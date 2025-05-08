@@ -9,7 +9,17 @@ const pool = mysql.createPool({
   database: process.env.DB_NAME,
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0
+  queueLimit: 0,
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 0
 });
 
-module.exports = pool.promise();
+// Convert pool to promise-based interface
+const promisePool = pool.promise();
+
+// Test the connection
+promisePool.query('SELECT 1')
+  .then(() => console.log('Database connection successful'))
+  .catch(err => console.error('Database connection failed:', err));
+
+module.exports = promisePool;
