@@ -21,13 +21,31 @@ const authRoutes = require('./routes/auth');
 const projectRoutes = require('./routes/projects');
 const taskRoutes = require('./routes/tasks');
 
+// Add root route
+app.get('/', (req, res) => {
+    res.json({ 
+        message: 'Task Management API is running',
+        endpoints: {
+            auth: '/auth',
+            projects: '/projects',
+            tasks: '/tasks'
+        }
+    });
+});
+
 app.use('/auth', authRoutes);
 app.use('/projects', projectRoutes);
 app.use('/tasks', taskRoutes);
 
 // Start the server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
-    console.log('Access your API at: https://[your-repl-name].[username].repl.co');
+    console.log(`Access your API at: https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`);
+}).on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+        console.error(`Port ${PORT} is already in use`);
+    } else {
+        console.error('Server error:', err.message);
+    }
 });
