@@ -29,4 +29,5 @@ app.use('/tasks', taskRoutes);
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
+    console.log('Access your API at: https://[your-repl-name].[username].repl.co');
 });
